@@ -32,7 +32,7 @@ jobs:
           source: "target/patrimonio-0.0.1-SNAPSHOT.jar"
           target: "/home/ubuntu/patrimonio/target"
 
-      - name: 🔁 Parar app anterior e iniciar novo no EC2 via SSH (tmux)
+      - name: 🔁 Parar app anterior e iniciar novo no EC2 via SSH (setsid)
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -42,6 +42,4 @@ jobs:
           script: |
             cd /home/ubuntu/patrimonio
             pkill -f 'patrimonio-0.0.1-SNAPSHOT.jar' || true
-            tmux kill-session -t patrimonio || true
-            tmux new-session -d -s patrimonio "java -jar target/patrimonio-0.0.1-SNAPSHOT.jar > log.txt 2>&1"
-            sleep 15  # <-- dá tempo da sessão se fixar
+            setsid java -jar target/patrimonio-0.0.1-SNAPSHOT.jar > log.txt 2>&1 < /dev/null &
