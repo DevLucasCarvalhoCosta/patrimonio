@@ -7,12 +7,12 @@ services:
     startCommand: "java -jar target/patrimonio-0.0.1-SNAPSHOT.jar"
     envVars:
       - key: PGHOST
-        value: <será definido no painel>
+        value: dpg-db8b0ers6ouf73acncsq-a
       - key: PGPORT
         value: 5432
       - key: PGUSER
-        value: postgres
+        value: user
       - key: PGPASSWORD
-        value: <será definido no painel>
+        value: sXPcI1tVrcZ1R9ogzim8WBzBi8eSmw6K
       - key: PGDATABASE
-        value: railway
+        value: patrimonio_plcr
