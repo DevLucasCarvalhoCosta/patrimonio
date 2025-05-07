@@ -13,12 +13,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Deploy to EC2 via SSH
+      - name: Deploy via SSH to EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
+          host: ${{ secrets.EC2_HOST }} # ou substitua diretamente pelo IP, como 3.149.233.112
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
           port: 22
           timeout: 30s
           command_timeout: 10m
