@@ -1,4 +1,4 @@
-name: Deploy to EC2
+name: Deploy para EC2
 
 on:
   push:
@@ -10,22 +10,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Clonar o repositório
         uses: actions/checkout@v3
 
-      - name: Deploy via SSH to EC2
+      - name: Configurar JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build do projeto com Maven
+        run: |
+          chmod +x mvnw
+          ./mvnw clean package
+
+      - name: Copiar arquivos para o servidor EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          port: 22
+          source: "target/patrimonio-0.0.1-SNAPSHOT.jar"
+          target: "/home/ubuntu/patrimonio/target"
+
+      - name: Executar aplicação no EC2 via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: ${{ secrets.EC2_HOST }} # ou substitua diretamente pelo IP, como 3.149.233.112
+          host: ${{ secrets.HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           port: 22
           timeout: 30s
           command_timeout: 10m
           script: |
-            cd /home/ubuntu/patrimonio
-            chmod +x mvnw
-            ./mvnw clean package
+            cd ~/patrimonio
+
+            # Garante permissões e mata processo antigo
             pkill -f 'patrimonio-0.0.1-SNAPSHOT.jar' || true
             tmux kill-session -t patrimonio || true
-            tmux new-session -d -s patrimonio "bash -c 'java -jar target/patrimonio-0.0.1-SNAPSHOT.jar > log.txt 2>&1'"
+
+            # Inicia nova sessão tmux com o app rodando
+            tmux new-session -d -s patrimonio "
+              java -jar target/patrimonio-0.0.1-SNAPSHOT.jar >> log.txt 2>&1
+            "
