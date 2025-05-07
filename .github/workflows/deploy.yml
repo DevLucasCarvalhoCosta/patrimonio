@@ -1,4 +1,4 @@
-name: Deploy AWS EC2
+name: Deploy para EC2
 
 on:
   push:
@@ -7,7 +7,6 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to EC2
     runs-on: ubuntu-latest
 
     steps:
@@ -20,6 +19,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
+          port: 22
           source: "."
           target: "/home/ubuntu/patrimonio"
           rm: true
@@ -30,10 +30,11 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
+          port: 22
           script: |
             cd /home/ubuntu/patrimonio
             chmod +x mvnw
             ./mvnw clean package
             pkill -f 'patrimonio-0.0.1-SNAPSHOT.jar' || true
-            nohup java -jar target/patrimonio-0.0.1-SNAPSHOT.jar > log.txt 2>&1 &
-            disown
+            tmux kill-session -t patrimonio || true
+            tmux new-session -d -s patrimonio 'java -jar target/patrimonio-0.0.1-SNAPSHOT.jar > log.txt 2>&1'
