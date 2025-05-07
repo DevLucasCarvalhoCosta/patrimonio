@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: patrimonio-app
+    env: java
+    plan: free
+    buildCommand: "./mvnw clean package -DskipTests"
+    startCommand: "java -jar target/patrimonio-0.0.1-SNAPSHOT.jar"
+    envVars:
+      - key: PGHOST
+        value: dpg-db8b0ers6ouf73acncsq-a
+      - key: PGPORT
+        value: 5432
+      - key: PGUSER
+        value: user
+      - key: PGPASSWORD
+        value: sXPcI1tVrcZ1R9ogzim8WBzBi8eSmw6K
+      - key: PGDATABASE
+        value: patrimonio_plcr
